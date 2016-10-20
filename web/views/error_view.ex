@@ -1,12 +1,15 @@
 defmodule ReadQ.ErrorView do
   use ReadQ.Web, :view
+  use JaSerializer.PhoenixView
 
   def render("404.json", _assigns) do
-    %{errors: %{detail: "Page not found"}}
+    %{title: "Not found", code: 404}
+    |> JaSerializer.ErrorSerializer.format
   end
 
   def render("500.json", _assigns) do
-    %{errors: %{detail: "Internal server error"}}
+    %{title: "Internal server error", code: 500}
+    |> JaSerializer.ErrorSerializer.format
   end
 
   # In case no render clause matches or no

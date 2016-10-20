@@ -4,6 +4,6 @@ defmodule ReadQ.EntryController do
   alias ReadQ.Entry
 
   def index(conn, _params) do
-    render conn, "index.json", data: Repo.all(Entry)
+    render conn, data: Repo.all(Entry)
   end
 end

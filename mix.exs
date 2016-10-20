@@ -36,6 +36,8 @@ defmodule ReadQ.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
+     {:cors_plug, "~> 1.1"},
+     {:ja_serializer, "~> 0.11.1"},
      {:ex_machina, "~> 1.0"}]
   end
 

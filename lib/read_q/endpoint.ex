@@ -36,5 +36,7 @@ defmodule ReadQ.Endpoint do
     key: "_read_q_key",
     signing_salt: "Q2HdN/xt"
 
+  plug CORSPlug
+
   plug ReadQ.Router
 end

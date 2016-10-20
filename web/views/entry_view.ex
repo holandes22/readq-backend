@@ -1,18 +1,5 @@
 defmodule ReadQ.EntryView do
+  use JaSerializer.PhoenixView
 
-  def render("index.json", %{data: entries}) do
-    %{
-      entries: Enum.map(entries, &entry_json/1)
-    }
-  end
-
-  def entry_json(entry) do
-    %{
-      link: entry.link,
-      notes: entry.notes,
-      archived: entry.archived,
-      inserted_at: entry.inserted_at,
-      tags: entry.tags
-    }
-  end
+  attributes [:link, :notes, :archived, :inserted_at, :tags]
 end

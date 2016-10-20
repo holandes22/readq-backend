@@ -13,7 +13,7 @@ config :read_q,
 config :read_q, ReadQ.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "8BLRb0Rzgcqt22jpVC+1y1KJswHTXSFNcaHNPrnKx1BIyHlHWF7XyBfqQCQDNW3o",
-  render_errors: [view: ReadQ.ErrorView, accepts: ~w(json)],
+  render_errors: [view: ReadQ.ErrorView, accepts: ~w(json json-api)],
   pubsub: [name: ReadQ.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
@@ -25,3 +25,10 @@ config :logger, :console,
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
+
+config :phoenix, :format_encoders,
+  "json-api": Poison
+
+config :mime, :types, %{
+  "application/vnd.api+json" => ["json-api"]
+}
