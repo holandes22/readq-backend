@@ -26,6 +26,7 @@ defmodule ReadQ.ConnCase do
       import Ecto.Query
 
       import ReadQ.Router.Helpers
+      import ReadQ.Factory
 
       # The default endpoint for testing
       @endpoint ReadQ.Endpoint
