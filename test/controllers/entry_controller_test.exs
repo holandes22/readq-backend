@@ -147,7 +147,7 @@ defmodule ReadQ.EntryControllerTest do
       conn = post conn, entry_path(conn, :create), data: data
 
       errors = json_response(conn, 422)["errors"]
-      assert Enum.at(errors, 0)["detail"] == "Tags should only contain slugs"
+      assert Enum.at(errors, 0)["source"]["pointer"] == "/data/attributes/tags"
     end
 
   end

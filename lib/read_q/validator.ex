@@ -14,7 +14,7 @@ defmodule ReadQ.Validator do
     validate_change changeset, field, fn(_, slugs) ->
       case Enum.all?(slugs, fn(slug) -> validate_slug(slug) end) do
         true -> []
-        false -> [{field, "should only contain slugs"}]
+        false -> [{field, "should only contain valid slugs (numbers, letters and dashes not exceeding 30 chars)"}]
       end
     end
   end
