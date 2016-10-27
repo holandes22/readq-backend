@@ -18,11 +18,9 @@ defmodule ReadQ.Entry do
     struct
     |> cast(params, [:archived, :notes, :link, :tags])
     |> validate_required([:link])
-
-  # link is a valid URL
-  # Validate notes length
-  # Validate tags length
-  # Validate each tag is a slug
+    |> validate_url(:link)
+    |> validate_length(:tags, max: 10)
+    |> validate_slug_list(:tags)
   end
 
 end

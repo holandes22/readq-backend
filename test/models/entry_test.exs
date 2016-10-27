@@ -3,7 +3,7 @@ defmodule ReadQ.EntryTest do
 
   alias ReadQ.Entry
 
-  @valid_attrs %{archived: true, link: "some content", notes: "some content"}
+  @valid_attrs %{archived: true, link: "http://a.com", notes: "some content"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
