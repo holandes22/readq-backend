@@ -25,7 +25,7 @@ defmodule ReadQ.ValidatorTest do
   ]
 
   @valid_slugs ["a", "a-b", "a1", "b-2", "2"]
-  @invalid_slugs [".a", "a-", "a_b", "#aa", "a.b", "a!", "a--b"]
+  @invalid_slugs [".a", "a-", "a_b", "#aa", "a.b", "a!", "a--b", "very-long-tag-about-functional-programming"]
 
   describe "validate_url" do
 
