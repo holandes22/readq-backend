@@ -35,14 +35,67 @@ defmodule ReadQ.EntryControllerTest do
     }
   end
 
-  describe "entry create" do
-    test "adds an entry in the database if valid params", %{conn: conn} do
-      data = %{type: "entry", attributes: %{link: "http://example.com"}}
-      conn = post conn, entry_path(conn, :create), data: data
-
-      data = json_response(conn, 201)["data"]
-      assert Repo.get!(ReadQ.Entry, data["id"])
+  test "show returns 404 if no such entry", %{conn: conn} do
+    assert_error_sent 404, fn ->
+      get conn, entry_path(conn, :show, -1)
     end
+  end
+
+  test "create adds an entry in the database and renders resource", %{conn: conn} do
+    data = %{type: "entry", attributes: %{link: "http://example.com"}}
+    conn = post conn, entry_path(conn, :create), data: data
+
+    data = json_response(conn, 201)["data"]
+    assert Repo.get!(ReadQ.Entry, data["id"])
+  end
+
+  describe "update" do
+
+    test "modifies the entry in the database and renders resource", %{conn: conn} do
+      entry = insert(:entry, %{archived: false})
+
+      data = %{
+        type: "entry",
+        id: entry.id,
+        attributes: %{link: "http://new-url.com", archived: true}
+      }
+      conn = patch conn, entry_path(conn, :update, entry), data: data
+
+      data = json_response(conn, 200)["data"]
+      entry = Repo.get!(ReadQ.Entry, data["id"])
+
+      assert entry.link == data["attributes"]["link"]
+      assert entry.archived
+    end
+
+    test "returns 404 if no such entry", %{conn: conn} do
+      assert_error_sent 404, fn ->
+        get conn, entry_path(conn, :update, -1), data: %{}
+      end
+    end
+
+  end
+
+  describe "delete" do
+
+    test "delete removes the entry from the database", %{conn: conn} do
+      entry = insert(:entry)
+
+      conn = delete conn, entry_path(conn, :delete, entry)
+
+      assert response(conn, 204)
+      refute Repo.get(ReadQ.Entry, entry.id)
+    end
+
+    test "returns 404 if no such entry", %{conn: conn} do
+      assert_error_sent 404, fn ->
+        get conn, entry_path(conn, :delete, -1)
+      end
+    end
+
+  end
+
+  describe "entry validation" do
 
     test "returns error if invalid data", %{conn: conn} do
       data = %{
@@ -86,7 +139,7 @@ defmodule ReadQ.EntryControllerTest do
     end
 
     test "returns error if tags contains non-slugs", %{conn: conn} do
-      tags = ["a-b", "b.a"]
+      tags = ["valid-one", "invalid.slug--"]
       data = %{
         type: "entry",
         attributes: %{link: "http://a.com", tags: tags}

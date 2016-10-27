@@ -10,6 +10,6 @@ defmodule ReadQ.Router do
   scope "/api", ReadQ do
     pipe_through :api
 
-    resources "/entries", EntryController, only: [:index, :show, :create]
+    resources "/entries", EntryController, only: [:index, :show, :create, :update, :delete]
   end
 end
