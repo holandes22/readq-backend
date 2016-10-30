@@ -18,7 +18,7 @@ defmodule ReadQ.EntryController do
     case Repo.insert(changeset) do
       {:ok, entry} ->
         conn
-        |> put_status(201)
+        |> put_status(:created)
         |> render(:show, data: entry)
 
       {:error, changeset} ->
@@ -26,6 +26,11 @@ defmodule ReadQ.EntryController do
         |> put_status(:unprocessable_entity)
         |> render(:errors, data: changeset)
     end
+  end
+  def create(conn, %{}) do
+    conn
+      |> put_status(400)
+      |> render(:errors, data: %{detail: "Missing data", code: 400})
   end
 
   def update(conn, %{"data" => data}) do

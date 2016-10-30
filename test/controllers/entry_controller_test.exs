@@ -100,15 +100,13 @@ defmodule ReadQ.EntryControllerTest do
     test "returns error if invalid data", %{conn: conn} do
       data = %{
         type: "entry",
-        #attributes: %{link: 1, notes: ["a"], archived: "string", tags: [1, 2]}
-        attributes: %{link: 1, notes: ["a"], archived: "string"}
+        attributes: %{link: 1, notes: ["a"], archived: "string", tags: [1, 2]}
       }
       conn = post conn, entry_path(conn, :create), data: data
 
       errors = json_response(conn, 422)["errors"]
-      assert length(errors) == 3
+      assert length(errors) == 4
     end
-
 
     test "returns error if invalid url", %{conn: conn} do
       data = %{type: "entry", attributes: %{link: "ia:aa"}}
