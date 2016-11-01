@@ -12,7 +12,13 @@ defmodule ReadQ.AuthController do
   defp get_token!(_, _), do: raise "No matching provider available"
 
   defp get_user!("github", client) do
-    %{body: user} = OAuth2.Client.get!(client, "/user")
-    %{name: user["name"], avatar: user["avatar_url"]}
+    %{body: emails} = OAuth2.Client.get!(client, "/user/emails")
+
+    %{email: get_primary_email(emails)}
+  end
+
+  def get_primary_email(emails) do
+    email = Enum.find(emails, Enum.at(emails, 0), fn(email) -> email["primary"] == true end)
+    email["email"]
   end
 end
