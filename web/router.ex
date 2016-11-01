@@ -7,6 +7,16 @@ defmodule ReadQ.Router do
     plug JaSerializer.Deserializer
   end
 
+  pipeline :auth do
+    plug :accepts, ["json"]
+  end
+
+  scope "/auth", ReadQ do
+    pipe_through :auth
+
+    get "/:provider/callback", AuthController, :callback
+  end
+
   scope "/api", ReadQ do
     pipe_through :api
 

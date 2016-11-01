@@ -17,6 +17,12 @@ config :read_q, ReadQ.Endpoint,
   pubsub: [name: ReadQ.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+# Configure strategy
+config :read_q, GitHub,
+  client_id: System.get_env("GITHUB_CLIENT_ID"),
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
+  redirect_uri: System.get_env("GITHUB_REDIRECT_URI")
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
@@ -32,3 +38,5 @@ config :phoenix, :format_encoders,
 config :mime, :types, %{
   "application/vnd.api+json" => ["json-api"]
 }
+
+config :oauth2, debug: true
