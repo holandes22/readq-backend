@@ -5,6 +5,7 @@ defmodule ReadQ.Router do
     plug :accepts, ["json-api"]
     plug JaSerializer.ContentTypeNegotiation
     plug JaSerializer.Deserializer
+    plug ReadQ.Plug.Authenticate
   end
 
   pipeline :auth do
@@ -22,4 +23,5 @@ defmodule ReadQ.Router do
 
     resources "/entries", EntryController, only: [:index, :show, :create, :update, :delete]
   end
+
 end

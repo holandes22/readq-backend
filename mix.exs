@@ -41,6 +41,7 @@ defmodule ReadQ.Mixfile do
       {:ja_serializer, git: "git://github.com/AgilionApps/ja_serializer.git"},
       {:ex_machina, "~> 1.0"},
       {:oauth2, "~> 0.8"}
+      #{:guardian, "~> 0.13.0"}
     ]
   end
 
