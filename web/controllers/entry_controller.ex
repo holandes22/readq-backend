@@ -5,12 +5,18 @@ defmodule ReadQ.EntryController do
 
   plug PolicyWonk.Enforce, :current_user
 
-  def index(conn, _params) do
-    render conn, data: Repo.all(Entry)
+  defp user_entries(user) do
+    assoc(user, :entries)
   end
 
-  def show(conn, params) do
-    render conn, data: Repo.get!(Entry, params["id"])
+  def index(conn, _params) do
+    entries = user_entries(conn.assigns.current_user)
+    render conn, data: Repo.all(entries)
+  end
+
+  def show(conn, %{"id" => id}) do
+    entries = user_entries(conn.assigns.current_user)
+    render conn, data: Repo.get!(entries, id)
   end
 
   def create(conn, %{"data" => data}) do

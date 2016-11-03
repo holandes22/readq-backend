@@ -19,7 +19,6 @@ defmodule ReadQ.EntryControllerTest do
   end
 
   describe "when user is authenticated" do
-
     setup [:log_user_in]
 
     test "index returns a list of entries", %{conn: conn, user: user} do
@@ -31,7 +30,8 @@ defmodule ReadQ.EntryControllerTest do
     end
 
     test "show returns an entry", %{conn: conn, user: user} do
-      entry = insert(:entry)
+      insert(:entry)
+      entry = insert(:entry, user: user)
 
       conn = get conn, entry_path(conn, :show, entry)
 
@@ -55,6 +55,7 @@ defmodule ReadQ.EntryControllerTest do
     end
 
     test "create adds an entry in the database and renders resource", %{conn: conn} do
+      # TODO: is created for current_user
       data = %{type: "entry", attributes: %{link: "http://example.com"}}
       conn = post conn, entry_path(conn, :create), data: data
 
@@ -103,43 +104,43 @@ defmodule ReadQ.EntryControllerTest do
   end
 
   describe "when unauthenticated" do
+    # TODO: test all the endpoints
 
-    test "index return 401 if not authorization header", %{conn: conn} do
-      assert_error_sent 401, fn ->
-        get conn, entry_path(conn, :index)
-      end
+    test "index returns 401 if no authorization header", %{conn: conn} do
+      conn = get conn, entry_path(conn, :index)
+      assert response(conn, 401)
     end
 
-    test "index return 401 if bad authorization header", %{conn: conn} do
+    test "index returns 401 if bad authorization header", %{conn: conn} do
       put_req_header(conn, "authorization", "bad token")
-      assert_error_sent 401, fn ->
-        get conn, entry_path(conn, :index)
-      end
+      conn = get conn, entry_path(conn, :index)
+      assert response(conn, 401)
     end
 
-    test "show return 401 if not authorization header" do
-    end
-
-    test "create return 401 if not authorization header" do
-    end
-
-    test "update return 401 if not authorization header" do
-    end
-
-    test "delete return 401 if not authorization header" do
+    test "show returns 401 if no authorization header", %{conn: conn} do
+      conn = get conn, entry_path(conn, :show, 1)
+      assert response(conn, 401)
     end
 
   end
 
-  describe "when user requests resource without permissions" do
+  describe "when user requests resource that does not own" do
+    # TODO: test all the endpoints
+    setup [:log_user_in]
 
-    test "index return 403" do
-      assert 1 + 1 == 2
+    test "show returns 404", %{conn: conn} do
+      user = insert(:user)
+      entry = insert(:entry, user: user)
+
+      assert_error_sent 404, fn ->
+        get conn, entry_path(conn, :show, entry)
+      end
     end
 
   end
 
   describe "entry validation" do
+    setup [:log_user_in]
 
     test "returns error if invalid data", %{conn: conn} do
       data = %{

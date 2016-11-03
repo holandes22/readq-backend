@@ -3,6 +3,7 @@ defmodule ReadQ.User do
 
   schema "users" do
     field :email, :string
+    has_many :entries, ReadQ.Entry
 
     timestamps()
   end
