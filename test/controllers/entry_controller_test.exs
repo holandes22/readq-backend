@@ -22,14 +22,15 @@ defmodule ReadQ.EntryControllerTest do
 
     setup [:log_user_in]
 
-    test "index returns a list of entries", %{conn: conn} do
+    test "index returns a list of entries", %{conn: conn, user: user} do
       insert(:entry)
+      insert(:entry, user: user)
 
       conn = get conn, entry_path(conn, :index)
       assert Enum.count(json_response(conn, 200)["data"]) == 1
     end
 
-    test "show returns an entry", %{conn: conn} do
+    test "show returns an entry", %{conn: conn, user: user} do
       entry = insert(:entry)
 
       conn = get conn, entry_path(conn, :show, entry)

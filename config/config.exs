@@ -40,3 +40,6 @@ config :mime, :types, %{
 }
 
 config :oauth2, debug: true
+
+config :policy_wonk, PolicyWonk,
+  policies: ReadQ.Policies

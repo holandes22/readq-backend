@@ -11,8 +11,7 @@ defmodule ReadQ.Plug.Authenticate do
          {:ok, user} <- get_user(repo, email) do
         assign(conn, :current_user, user)
     else
-      {:error, _} ->
-        assign(conn, :current_user, :anonymous)
+       {:error, _} -> conn
     end
   end
 

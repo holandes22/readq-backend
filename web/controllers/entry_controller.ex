@@ -3,6 +3,8 @@ defmodule ReadQ.EntryController do
 
   alias ReadQ.Entry
 
+  plug PolicyWonk.Enforce, :current_user
+
   def index(conn, _params) do
     render conn, data: Repo.all(Entry)
   end

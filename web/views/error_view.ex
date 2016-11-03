@@ -2,6 +2,11 @@ defmodule ReadQ.ErrorView do
   use ReadQ.Web, :view
   use JaSerializer.PhoenixView
 
+  def render("401.json", _assigns) do
+    %{title: "Unauthorized", code: 401}
+    |> JaSerializer.ErrorSerializer.format
+  end
+
   def render("404.json", _assigns) do
     %{title: "Not found", code: 404}
     |> JaSerializer.ErrorSerializer.format
