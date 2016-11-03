@@ -8,4 +8,10 @@ defmodule ReadQ.Factory do
       tags: ["a", "b", "c"]
     }
   end
+
+  def user_factory do
+    %ReadQ.User{
+      email: "p@p.com"
+    }
+  end
 end

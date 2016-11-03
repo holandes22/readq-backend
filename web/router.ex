@@ -5,7 +5,7 @@ defmodule ReadQ.Router do
     plug :accepts, ["json-api"]
     plug JaSerializer.ContentTypeNegotiation
     plug JaSerializer.Deserializer
-    plug ReadQ.Plug.Authenticate
+    plug ReadQ.Plug.Authenticate, repo: ReadQ.Repo
   end
 
   pipeline :auth do

@@ -7,6 +7,7 @@ defmodule ReadQ.Entry do
     field :notes, :string
     field :link, :string
     field :tags, {:array, :string}
+    belongs_to :user, ReadQ.User
 
     timestamps()
   end

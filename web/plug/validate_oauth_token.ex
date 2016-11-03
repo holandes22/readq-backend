@@ -2,16 +2,17 @@ defmodule ReadQ.Plug.Authenticate do
   import Plug.Conn
 
   def init(opts) do
-    opts
+    Keyword.fetch!(opts, :repo)
   end
 
-  def call(conn, _opts) do
+  def call(conn, repo) do
     with {:ok, token} <- get_token(conn),
-         {:ok, user}  <- get_user(token) do
-        assign(conn, :curent_user, user)
+         {:ok, %{email: email}}  <- get_remote_user(token),
+         {:ok, user} <- get_user(repo, email) do
+        assign(conn, :current_user, user)
     else
       {:error, _} ->
-        assign(conn, :curent_user, %{email: "Anon"})
+        assign(conn, :current_user, :anonymous)
     end
   end
 
@@ -24,7 +25,15 @@ defmodule ReadQ.Plug.Authenticate do
     end
   end
 
-  defp get_user(token) do
+  defp get_remote_user(token) do
     GitHub.client(token) |> GitHub.get_user()
+  end
+
+  defp get_user(repo, email) do
+    case repo.get_by(ReadQ.User, email: email) do
+      user -> {:ok, user}
+      nil  -> {:error, nil}
+    end
+
   end
 end

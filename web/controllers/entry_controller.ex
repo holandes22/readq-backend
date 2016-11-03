@@ -4,6 +4,8 @@ defmodule ReadQ.EntryController do
   alias ReadQ.Entry
 
   def index(conn, _params) do
+    IO.puts "curr user:"
+    IO.inspect conn.assigns.current_user
     render conn, data: Repo.all(Entry)
   end
 

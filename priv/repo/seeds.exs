@@ -11,7 +11,16 @@
 # and so on) as they will fail if something goes wrong.
 
 import ReadQ.Factory
+alias ReadQ.Repo
 
-insert(:entry)
-insert(:entry)
-insert(:entry)
+Repo.delete_all(ReadQ.Entry)
+Repo.delete_all(ReadQ.User)
+
+user1 = insert(:user)
+user2 = insert(:user)
+
+insert(:entry, user: user1)
+insert(:entry, user: user1)
+insert(:entry, user: user1)
+insert(:entry, user: user2)
+insert(:entry, user: user2)
