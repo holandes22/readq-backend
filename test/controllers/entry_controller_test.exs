@@ -1,57 +1,67 @@
 defmodule ReadQ.EntryControllerTest do
   use ReadQ.ConnCase
 
+  @email "eder@caed-nua.com"
+
   setup %{conn: conn} do
     conn =
       conn
       |> put_req_header("accept", "application/vnd.api+json")
       |> put_req_header("content-type", "application/vnd.api+json")
 
-    {:ok, conn: conn}
+    user = insert(:user, email: @email)
+
+    {:ok, conn: conn, user: user}
   end
 
-  test "index returns a list of entries", %{conn: conn} do
-    insert(:entry)
-
-    conn = get conn, entry_path(conn, :index)
-    assert Enum.count(json_response(conn, 200)["data"]) == 1
+  def log_user_in(%{conn: conn, user: user}) do
+    %{conn: assign(conn, :current_user, user), user: user}
   end
 
-  test "show returns an entry", %{conn: conn} do
-    entry = insert(:entry)
+  describe "when user is authenticated" do
 
-    conn = get conn, entry_path(conn, :show, entry)
+    setup [:log_user_in]
 
-    assert json_response(conn, 200)["data"] == %{
-      "id" => to_string(entry.id),
-      "type" => "entry",
-      "attributes" => %{
-        "link" => entry.link,
-        "tags" => entry.tags,
-        "notes" => entry.notes,
-        "archived" => entry.archived,
-        "inserted-at" => Ecto.DateTime.to_iso8601(entry.inserted_at)
-      }
-    }
-  end
+    test "index returns a list of entries", %{conn: conn} do
+      insert(:entry)
 
-  test "show returns 404 if no such entry", %{conn: conn} do
-    assert_error_sent 404, fn ->
-      get conn, entry_path(conn, :show, -1)
+      conn = get conn, entry_path(conn, :index)
+      assert Enum.count(json_response(conn, 200)["data"]) == 1
     end
-  end
 
-  test "create adds an entry in the database and renders resource", %{conn: conn} do
-    data = %{type: "entry", attributes: %{link: "http://example.com"}}
-    conn = post conn, entry_path(conn, :create), data: data
+    test "show returns an entry", %{conn: conn} do
+      entry = insert(:entry)
 
-    data = json_response(conn, 201)["data"]
-    assert Repo.get!(ReadQ.Entry, data["id"])
-  end
+      conn = get conn, entry_path(conn, :show, entry)
 
-  describe "update" do
+      assert json_response(conn, 200)["data"] == %{
+        "id" => to_string(entry.id),
+        "type" => "entry",
+        "attributes" => %{
+          "link" => entry.link,
+          "tags" => entry.tags,
+          "notes" => entry.notes,
+          "archived" => entry.archived,
+          "inserted-at" => Ecto.DateTime.to_iso8601(entry.inserted_at)
+        }
+      }
+    end
 
-    test "modifies the entry in the database and renders resource", %{conn: conn} do
+    test "show returns 404 if no such entry", %{conn: conn} do
+      assert_error_sent 404, fn ->
+        get conn, entry_path(conn, :show, -1)
+      end
+    end
+
+    test "create adds an entry in the database and renders resource", %{conn: conn} do
+      data = %{type: "entry", attributes: %{link: "http://example.com"}}
+      conn = post conn, entry_path(conn, :create), data: data
+
+      data = json_response(conn, 201)["data"]
+      assert Repo.get!(ReadQ.Entry, data["id"])
+    end
+
+    test "update modifies the entry in the database and renders resource", %{conn: conn} do
       entry = insert(:entry, %{archived: false})
 
       data = %{
@@ -68,15 +78,11 @@ defmodule ReadQ.EntryControllerTest do
       assert entry.archived
     end
 
-    test "returns 404 if no such entry", %{conn: conn} do
+    test "update returns 404 if no such entry", %{conn: conn} do
       assert_error_sent 404, fn ->
         get conn, entry_path(conn, :update, -1), data: %{}
       end
     end
-
-  end
-
-  describe "delete" do
 
     test "delete removes the entry from the database", %{conn: conn} do
       entry = insert(:entry)
@@ -87,10 +93,47 @@ defmodule ReadQ.EntryControllerTest do
       refute Repo.get(ReadQ.Entry, entry.id)
     end
 
-    test "returns 404 if no such entry", %{conn: conn} do
+    test "delete returns 404 if no such entry", %{conn: conn} do
       assert_error_sent 404, fn ->
         get conn, entry_path(conn, :delete, -1)
       end
+    end
+
+  end
+
+  describe "when unauthenticated" do
+
+    test "index return 401 if not authorization header", %{conn: conn} do
+      assert_error_sent 401, fn ->
+        get conn, entry_path(conn, :index)
+      end
+    end
+
+    test "index return 401 if bad authorization header", %{conn: conn} do
+      put_req_header(conn, "authorization", "bad token")
+      assert_error_sent 401, fn ->
+        get conn, entry_path(conn, :index)
+      end
+    end
+
+    test "show return 401 if not authorization header" do
+    end
+
+    test "create return 401 if not authorization header" do
+    end
+
+    test "update return 401 if not authorization header" do
+    end
+
+    test "delete return 401 if not authorization header" do
+    end
+
+  end
+
+  describe "when user requests resource without permissions" do
+
+    test "index return 403" do
+      assert 1 + 1 == 2
     end
 
   end

@@ -31,8 +31,8 @@ defmodule ReadQ.Plug.Authenticate do
 
   defp get_user(repo, email) do
     case repo.get_by(ReadQ.User, email: email) do
-      user -> {:ok, user}
       nil  -> {:error, nil}
+      user -> {:ok, user}
     end
 
   end
