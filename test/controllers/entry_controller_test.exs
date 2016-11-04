@@ -54,17 +54,20 @@ defmodule ReadQ.EntryControllerTest do
       end
     end
 
-    test "create adds an entry in the database and renders resource", %{conn: conn} do
-      # TODO: is created for current_user
+    test "create adds an entry in the database and renders resource", %{conn: conn, user: user} do
       data = %{type: "entry", attributes: %{link: "http://example.com"}}
       conn = post conn, entry_path(conn, :create), data: data
 
       data = json_response(conn, 201)["data"]
-      assert Repo.get!(ReadQ.Entry, data["id"])
+      entry =
+        Repo.get!(ReadQ.Entry, data["id"])
+        |> Repo.preload(:user)
+      assert entry.user == user
+      assert entry.link == data["attributes"]["link"]
     end
 
-    test "update modifies the entry in the database and renders resource", %{conn: conn} do
-      entry = insert(:entry, %{archived: false})
+    test "update modifies the entry in the database and renders resource", %{conn: conn, user: user} do
+      entry = insert(:entry, user: user, archived: false)
 
       data = %{
         type: "entry",
@@ -86,8 +89,8 @@ defmodule ReadQ.EntryControllerTest do
       end
     end
 
-    test "delete removes the entry from the database", %{conn: conn} do
-      entry = insert(:entry)
+    test "delete removes the entry from the database", %{conn: conn, user: user} do
+      entry = insert(:entry, user: user)
 
       conn = delete conn, entry_path(conn, :delete, entry)
 
@@ -104,8 +107,6 @@ defmodule ReadQ.EntryControllerTest do
   end
 
   describe "when unauthenticated" do
-    # TODO: test all the endpoints
-
     test "index returns 401 if no authorization header", %{conn: conn} do
       conn = get conn, entry_path(conn, :index)
       assert response(conn, 401)
@@ -117,23 +118,26 @@ defmodule ReadQ.EntryControllerTest do
       assert response(conn, 401)
     end
 
-    test "show returns 401 if no authorization header", %{conn: conn} do
-      conn = get conn, entry_path(conn, :show, 1)
-      assert response(conn, 401)
+    test "show, update, delete return 401 if no authorization header", %{conn: conn} do
+      for action <- [:show, :update, :delete] do
+        conn = get conn, entry_path(conn, action, 1)
+        assert response(conn, 401)
+      end
     end
 
   end
 
   describe "when user requests resource that does not own" do
-    # TODO: test all the endpoints
     setup [:log_user_in]
 
     test "show returns 404", %{conn: conn} do
-      user = insert(:user)
-      entry = insert(:entry, user: user)
+      another_user = insert(:user)
+      entry = insert(:entry, user: another_user)
 
-      assert_error_sent 404, fn ->
-        get conn, entry_path(conn, :show, entry)
+      for action <- [:show, :update, :delete] do
+        assert_error_sent 404, fn ->
+          get conn, entry_path(conn, action, entry)
+        end
       end
     end
 

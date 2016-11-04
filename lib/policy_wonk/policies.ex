@@ -12,7 +12,7 @@ defmodule ReadQ.Policies do
   end
 
   def policy_error(conn, error_data) when is_bitstring(error_data), do:
-    @err_handler.unauthorized(conn, error_data )
-  def policy_error(conn, error_data), do: policy_error(conn, "Unauthorized")
+    @err_handler.unauthorized(conn, error_data)
+  def policy_error(conn, _error_data), do: policy_error(conn, "Unauthorized")
 
 end
