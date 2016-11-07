@@ -48,12 +48,6 @@ defmodule ReadQ.EntryControllerTest do
       }
     end
 
-    test "show returns 404 if no such entry", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, entry_path(conn, :show, -1)
-      end
-    end
-
     test "create adds an entry in the database and renders resource", %{conn: conn, user: user} do
       data = %{type: "entry", attributes: %{link: "http://example.com"}}
       conn = post conn, entry_path(conn, :create), data: data
@@ -83,12 +77,6 @@ defmodule ReadQ.EntryControllerTest do
       assert entry.archived
     end
 
-    test "update returns 404 if no such entry", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, entry_path(conn, :update, -1), data: %{}
-      end
-    end
-
     test "delete removes the entry from the database", %{conn: conn, user: user} do
       entry = insert(:entry, user: user)
 
@@ -98,9 +86,13 @@ defmodule ReadQ.EntryControllerTest do
       refute Repo.get(ReadQ.Entry, entry.id)
     end
 
-    test "delete returns 404 if no such entry", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, entry_path(conn, :delete, -1)
+    for action <- [:show, :update, :delete] do
+      @action action
+
+      test "#{action} returns 404 if no such entry", %{conn: conn} do
+        assert_error_sent 404, fn ->
+          get conn, entry_path(conn, @action, -1)
+        end
       end
     end
 
@@ -118,9 +110,11 @@ defmodule ReadQ.EntryControllerTest do
       assert response(conn, 401)
     end
 
-    test "show, update, delete return 401 if no authorization header", %{conn: conn} do
-      for action <- [:show, :update, :delete] do
-        conn = get conn, entry_path(conn, action, 1)
+    for action <- [:show, :update, :delete] do
+      @action action
+
+      test "#{action} returns 401 if no authorization header", %{conn: conn} do
+        conn = get conn, entry_path(conn, @action, 1)
         assert response(conn, 401)
       end
     end
@@ -130,13 +124,15 @@ defmodule ReadQ.EntryControllerTest do
   describe "when user requests resource that does not own" do
     setup [:log_user_in]
 
-    test "show returns 404", %{conn: conn} do
-      another_user = insert(:user)
-      entry = insert(:entry, user: another_user)
+    for action <- [:show, :update, :delete] do
+      @action action
 
-      for action <- [:show, :update, :delete] do
+      test "#{action} returns 404", %{conn: conn} do
+        another_user = insert(:user)
+        entry = insert(:entry, user: another_user)
+
         assert_error_sent 404, fn ->
-          get conn, entry_path(conn, action, entry)
+          get conn, entry_path(conn, @action, entry)
         end
       end
     end

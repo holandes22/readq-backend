@@ -4,6 +4,7 @@ defmodule ReadQ.AuthController do
 
   def callback(conn, %{"provider" => provider, "code" => code}) do
     client = get_token!(provider, code)
+    # TODO: handle error (if status != 200)
     %{email: email} = get_remote_user!(provider, client)
 
     user = case Repo.get_by(User, email: email) do
