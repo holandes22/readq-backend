@@ -6,12 +6,12 @@ defmodule ReadQ.ErrorViewTest do
 
   test "renders 404.json" do
 
-    assert render(ReadQ.ErrorView, "404.json", []) ==
+    assert render(ReadQ.ErrorView, "404.json-api", []) ==
            %{"errors" => [%{title: "Not found", code: 404}]}
   end
 
   test "render 500.json" do
-    assert render(ReadQ.ErrorView, "500.json", []) ==
+    assert render(ReadQ.ErrorView, "500.json-api", []) ==
            %{"errors" => [%{title: "Internal server error", code: 500}]}
   end
 
