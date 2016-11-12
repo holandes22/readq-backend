@@ -18,7 +18,7 @@ config :read_q, ReadQ.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   cache_static_manifest: "priv/static/manifest.json"
 
-config: :read_q, ReadQ.Repo,
+config :read_q, ReadQ.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL"),
   pool_size: 20
