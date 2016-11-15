@@ -1,7 +1,7 @@
 alias ReadQ.{Repo, User}
 import Ecto, only: [assoc: 2]
 
-{:ok, file} = File.open("./db.backup", [:write])
+{:ok, file} = File.open("/tmp/db.backup", [:write])
 
 for user <- Repo.all User do
   entries = assoc(user, :entries) |> Repo.all
