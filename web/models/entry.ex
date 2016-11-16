@@ -4,7 +4,7 @@ defmodule ReadQ.Entry do
 
   schema "entries" do
     field :archived, :boolean, default: false
-    field :notes, :string
+    field :notes, :string, default: ""
     field :link, :string
     field :tags, {:array, :string}
     belongs_to :user, ReadQ.User
