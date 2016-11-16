@@ -1,14 +1,14 @@
 alias ReadQ.{Repo, User}
 import Ecto, only: [assoc: 2]
 
-{:ok, file} = File.open("/tmp/db.backup", [:write])
+Logger.configure(level: :info)
 
 for user <- Repo.all User do
   entries = assoc(user, :entries) |> Repo.all
 
-  IO.binwrite file, "---user--- #{user.email}\n"
+  IO.puts "---user--- #{user.email}"
   for entry <- entries do
-    IO.binwrite file, "#{entry.link}:::#{entry.notes || "NULL_V"}:::#{entry.archived}:::#{entry.tags}\n"
+    IO.puts "#{entry.link}|#{entry.notes || "NULL_V"}|#{entry.archived}|#{entry.tags}|"
   end
 
 end
