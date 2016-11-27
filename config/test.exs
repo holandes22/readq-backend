@@ -17,3 +17,6 @@ config :read_q, ReadQ.Repo,
   database: "read_q_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :read_q,
+  entry_limit: 10

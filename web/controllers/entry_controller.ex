@@ -24,6 +24,17 @@ defmodule ReadQ.EntryController do
     render conn, data: Repo.get!(entries, id)
   end
 
+  defp can_create?(user) do
+    entry_limit = Application.get_env(:read_q, :entry_limit)
+    entry_count = user_entries(user) |> Repo.aggregate(:count, :id)
+
+    if entry_count <= entry_limit do
+      {:ok, true}
+    else
+      {:error, %{detail: "Entry limit reached", code: 422}}
+    end
+  end
+
   def create(conn, %{"data" => data}, user) do
     attrs = JaSerializer.Params.to_attributes(data)
 
@@ -32,17 +43,18 @@ defmodule ReadQ.EntryController do
       |> build_assoc(:entries)
       |> Entry.changeset(attrs)
 
-    case Repo.insert(changeset) do
-      {:ok, entry} ->
-        conn
-        |> put_status(:created)
-        |> render(:show, data: entry)
-
-      {:error, changeset} ->
+    with {:ok, true} <- can_create?(user),
+         {:ok, entry} <- Repo.insert(changeset) do
+      conn
+      |> put_status(:created)
+      |> render(:show, data: entry)
+    else
+      {:error, data} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(:errors, data: changeset)
+        |> render(:errors, data: data)
     end
+
   end
   def create(conn, %{}, _user) do
     conn

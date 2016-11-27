@@ -48,6 +48,16 @@ defmodule ReadQ.EntryControllerTest do
       }
     end
 
+    test "create fails if record limit is exceeded", %{conn: conn, user: user} do
+      insert_list(11, :entry, user: user)
+
+      data = %{type: "entry", attributes: %{link: "http://example.com"}}
+      conn = post conn, entry_path(conn, :create), data: data
+
+      errors = json_response(conn, 422)["errors"]
+      assert Enum.at(errors, 0)["detail"] == "Entry limit reached"
+    end
+
     test "create adds an entry in the database and renders resource", %{conn: conn, user: user} do
       data = %{type: "entry", attributes: %{link: "http://example.com"}}
       conn = post conn, entry_path(conn, :create), data: data

@@ -7,7 +7,8 @@ use Mix.Config
 
 # General application configuration
 config :read_q,
-  ecto_repos: [ReadQ.Repo]
+  ecto_repos: [ReadQ.Repo],
+  entry_limit: String.to_integer(System.get_env("ENTRY_LIMIT") || "2000")
 
 # Configures the endpoint
 config :read_q, ReadQ.Endpoint,
