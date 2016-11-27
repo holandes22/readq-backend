@@ -1,6 +1,7 @@
 defmodule ReadQ.AuthController do
   use ReadQ.Web, :controller
   alias ReadQ.{Repo, User}
+  require Logger
 
   def callback(conn, %{"provider" => provider, "code" => code}) do
     client = get_token!(provider, code)
@@ -24,6 +25,7 @@ defmodule ReadQ.AuthController do
   defp register_new_user(email) do
     changeset = User.changeset(%User{}, %{email: email})
     {:ok, user} = Repo.insert(changeset)
+    Logger.info "Registered user with email #{email}"
     user
   end
 

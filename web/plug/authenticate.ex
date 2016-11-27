@@ -1,5 +1,6 @@
 defmodule ReadQ.Plug.Authenticate do
   import Plug.Conn
+  require Logger
 
   def init(opts) do
     Keyword.fetch!(opts, :repo)
@@ -9,9 +10,10 @@ defmodule ReadQ.Plug.Authenticate do
     with {:ok, token} <- get_token(conn),
          {:ok, %{email: email}}  <- get_remote_user(token),
          {:ok, user} <- get_user(repo, email) do
+        Logger.info "Authenticated user with email #{email}"
         assign(conn, :current_user, user)
     else
-       {:error, _} -> conn
+      {:error, _} -> conn
     end
   end
 
